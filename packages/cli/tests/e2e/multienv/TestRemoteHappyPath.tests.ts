@@ -37,6 +37,7 @@ describe("Multi Env Happy Path for Azure", function () {
   const processEnv = mockTeamsfxMultiEnvFeatureFlag();
 
   it(`Can create/provision/deploy/build/validate/launch remote a azure tab/function/sql/bot project`, async function () {
+    const timestamps = [];
     try {
       let result;
       result = await execAsync(
@@ -48,7 +49,9 @@ describe("Multi Env Happy Path for Azure", function () {
         }
       );
       console.log(
-        `[Successfully] scaffold to ${projectPath}, stdout: '${result.stdout}', stderr: '${result.stderr}''`
+        `${new Date().getTime()} [Successfully] scaffold to ${projectPath}, stdout: '${
+          result.stdout
+        }', stderr: '${result.stderr}''`
       );
 
       // set subscription
@@ -57,7 +60,11 @@ describe("Multi Env Happy Path for Azure", function () {
         env: processEnv,
         timeout: 0,
       });
-      console.log(`[Successfully] set sub, stdout: '${result.stdout}', stderr: '${result.stderr}'`);
+      console.log(
+        `${new Date().getTime()} [Successfully] set sub, stdout: '${result.stdout}', stderr: '${
+          result.stderr
+        }'`
+      );
 
       // add env
       result = await execAsync(`teamsfx env add ${env} --env dev`, {
@@ -65,12 +72,16 @@ describe("Multi Env Happy Path for Azure", function () {
         env: processEnv,
         timeout: 0,
       });
-      console.log(`[Successfully] env add, stdout: '${result.stdout}', stderr: '${result.stderr}'`);
+      console.log(
+        `${new Date().getTime()} [Successfully] env add, stdout: '${result.stdout}', stderr: '${
+          result.stderr
+        }'`
+      );
 
       // update SKU from free to B1 to prevent free SKU limit error
       await setSimpleAuthSkuNameToB1Bicep(projectPath, env);
       await setBotSkuNameToB1Bicep(projectPath, env);
-      console.log(`[Successfully] update simple auth sku to B1`);
+      console.log(`${new Date().getTime()} [Successfully] update bot and simple auth sku to B1`);
 
       // list env
       result = await execAsync(`teamsfx env list`, {
@@ -82,7 +93,9 @@ describe("Multi Env Happy Path for Azure", function () {
       expect(envs).to.deep.equal(["dev", "e2e"]);
       expect(result.stderr).to.be.empty;
       console.log(
-        `[Successfully] env list, stdout: '${result.stdout}', stderr: '${result.stderr}'`
+        `${new Date().getTime()} [Successfully] env list, stdout: '${result.stdout}', stderr: '${
+          result.stderr
+        }'`
       );
 
       // provision
@@ -95,7 +108,9 @@ describe("Multi Env Happy Path for Azure", function () {
         }
       );
       console.log(
-        `[Successfully] provision, stdout: '${result.stdout}', stderr: '${result.stderr}'`
+        `${new Date().getTime()} [Successfully] provision, stdout: '${result.stdout}', stderr: '${
+          result.stderr
+        }'`
       );
 
       {
@@ -131,13 +146,19 @@ describe("Multi Env Happy Path for Azure", function () {
         const bot = BotValidator.init(context, true);
         await BotValidator.validateProvision(bot, true);
       }
+      console.log(`${new Date().getTime()} [Successfully] validate provision`);
 
       // deploy
-      await execAsyncWithRetry(`teamsfx deploy --env ${env}`, {
+      result = await execAsyncWithRetry(`teamsfx deploy --env ${env}`, {
         cwd: projectPath,
         env: processEnv,
         timeout: 0,
       });
+      console.log(
+        `${new Date().getTime()} [Successfully] deploy, stdout: '${result.stdout}', stderr: '${
+          result.stderr
+        }'`
+      );
 
       {
         // Validate provision
@@ -161,6 +182,8 @@ describe("Multi Env Happy Path for Azure", function () {
         await BotValidator.validateDeploy(bot);
       }
 
+      console.log(`${new Date().getTime()} [Successfully] validate deploy`);
+
       // validate manifest
       result = await execAsyncWithRetry(`teamsfx validate --env ${env}`, {
         cwd: projectPath,
@@ -172,9 +195,14 @@ describe("Multi Env Happy Path for Azure", function () {
         // Validate validate manifest
         expect(result.stderr).to.be.empty;
       }
+      console.log(
+        `${new Date().getTime()} [Successfully] validate, stdout: '${result.stdout}', stderr: '${
+          result.stderr
+        }'`
+      );
 
       // package
-      await execAsyncWithRetry(`teamsfx package --env ${env}`, {
+      result = await execAsyncWithRetry(`teamsfx package --env ${env}`, {
         cwd: projectPath,
         env: processEnv,
         timeout: 0,
@@ -186,12 +214,23 @@ describe("Multi Env Happy Path for Azure", function () {
         expect(await fs.pathExists(file)).to.be.true;
       }
 
+      console.log(
+        `${new Date().getTime()} [Successfully] package, stdout: '${result.stdout}', stderr: '${
+          result.stderr
+        }'`
+      );
+
       // publish
-      await execAsyncWithRetry(`teamsfx publish --env ${env}`, {
+      result = await execAsyncWithRetry(`teamsfx publish --env ${env}`, {
         cwd: projectPath,
         env: processEnv,
         timeout: 0,
       });
+      console.log(
+        `${new Date().getTime()} [Successfully] package, stdout: '${result.stdout}', stderr: '${
+          result.stderr
+        }'`
+      );
 
       {
         // Validate publish result
@@ -206,6 +245,11 @@ describe("Multi Env Happy Path for Azure", function () {
         AppStudioValidator.init(context);
         await AppStudioValidator.validatePublish(appId);
       }
+      console.log(
+        `${new Date().getTime()} [Successfully] package, stdout: '${result.stdout}', stderr: '${
+          result.stderr
+        }'`
+      );
     } catch (e) {
       console.log("Unexpected exception is thrown when running test: " + e);
       console.log(e.stack);
@@ -216,5 +260,6 @@ describe("Multi Env Happy Path for Azure", function () {
   after(async () => {
     // clean up
     await cleanUp(appName, projectPath, true, true, false, true, env);
+    console.log(`${new Date().getTime()} [Successfully] cleanup`);
   });
 });
