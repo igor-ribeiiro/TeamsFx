@@ -6,19 +6,6 @@ on:
       cases:
         description: "specific cases to be excuted."
         required: false
-  schedule:
-    - cron: "0 4,7,10 * * *"
-  pull_request:
-    branches:
-      - main
-      - dev
-    types:
-      - assigned
-      - opened
-      - synchronize
-      - reopened
-      - edited
-
 jobs:
   setup:
     runs-on: ubuntu-latest
@@ -35,6 +22,7 @@ jobs:
       CI_ENABLED: "true"
       M365_ACCOUNT_COLLABORATOR: ${{ secrets.TEST_COLLABORATOR_USER_NAME }}
       AZURE_DEVOPS_EXT_PAT: ${{ secrets.ADO_PAT }}
+      TEAMSFX_APIV2: "true"
     steps:
       - name: Checkout
         uses: actions/checkout@v2
@@ -92,6 +80,7 @@ jobs:
       CI_ENABLED: "true"
       M365_ACCOUNT_COLLABORATOR: ${{ secrets.TEST_COLLABORATOR_USER_NAME }}
       AZURE_DEVOPS_EXT_PAT: ${{ secrets.ADO_PAT }}
+      TEAMSFX_APIV2: "true"
     needs: setup
     runs-on: ubuntu-latest
     strategy:
