@@ -1,6 +1,9 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
 
+import { Constants } from "../aad/constants";
+import { GraphErrorCodes } from "../aad/errorCodes";
+import { CreateAppError, CreateSecretError } from "../aad/errors";
 import { ErrorNames, AzureConstants } from "./constants";
 import { Messages } from "./resources/messages";
 import { CommonStrings } from "./resources/strings";
@@ -16,7 +19,7 @@ export class PluginError extends Error {
   public details: string;
   public suggestions: string[];
   public errorType: ErrorType;
-  public innerError?: Error;
+  public innerError?: any;
   public helpLink?: string;
 
   constructor(
@@ -24,7 +27,7 @@ export class PluginError extends Error {
     name: string,
     details: string,
     suggestions: string[],
-    innerError?: Error,
+    innerError?: any,
     helpLink?: string
   ) {
     super(details);
@@ -34,11 +37,44 @@ export class PluginError extends Error {
     this.errorType = type;
     this.innerError = innerError;
     this.helpLink = helpLink;
+    this.inferFromInnerError();
     Object.setPrototypeOf(this, PluginError.prototype);
   }
 
   genMessage(): string {
     return `${this.message} Suggestions: ${this.suggestions.join(" ")}`;
+  }
+
+  inferFromInnerError() {
+    if (!this.innerError) return;
+
+    const errorCode = this.innerError.response?.data?.error?.code;
+    const helpLink = GraphErrorCodes.get(errorCode);
+    if (helpLink) this.helpLink = helpLink;
+
+    const statusCode = this.innerError.response?.statusCode;
+    if (
+      statusCode &&
+      statusCode >= Constants.statusCodeUserError &&
+      statusCode < Constants.statusCodeServerError
+    ) {
+      this.errorType = ErrorType.User;
+    } else {
+      this.errorType = ErrorType.System;
+    }
+  }
+}
+
+export class AppStudioAPICallsError extends PluginError {
+  constructor(
+    name: string,
+    message: string,
+    suggestions: string[],
+    statusCode?: number,
+    innerError?: Error,
+    helpLink?: string
+  ) {
+    super(ErrorType.User, name, message, suggestions, innerError, helpLink);
   }
 }
 
@@ -73,12 +109,24 @@ export class UserInputsError extends PluginError {
 export class AADAppCheckingError extends PluginError {
   constructor(innerError?: Error) {
     super(
-      ErrorType.System,
+      ErrorType.User,
       ErrorNames.CALL_APPSTUDIO_API_ERROR,
       Messages.FailToCallAppStudioForCheckingAADApp,
       [Messages.RetryTheCurrentStep],
       innerError
     );
+  }
+}
+
+export class CreateAADAppError extends PluginError {
+  constructor(innerError?: Error) {
+    super(ErrorType.User, CreateAppError.name, CreateAppError.message(), [], innerError);
+  }
+}
+
+export class CreateAADSecretError extends PluginError {
+  constructor(innerError?: Error) {
+    super(ErrorType.User, CreateSecretError.name, CreateSecretError.message(), [], innerError);
   }
 }
 
