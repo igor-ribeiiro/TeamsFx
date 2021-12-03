@@ -23,13 +23,20 @@ import {
 import AppStudioLogin from "../../../src/commonlib/appStudioLogin";
 
 describe("Test Add Function", function () {
-  const testFolder = getTestFolder();
-  const appName = getUniqueAppName();
-  const subscription = getSubscriptionId();
-  const projectPath = path.resolve(testFolder, appName);
+  let testFolder;
+  let appName;
+  let subscription;
+  let projectPath;
 
   // Should succeed on the 3rd try
   this.retries(2);
+
+  beforeEach(() => {
+    testFolder = getTestFolder();
+    appName = getUniqueAppName();
+    subscription = getSubscriptionId();
+    projectPath = path.resolve(testFolder, appName);
+  });
 
   it(`Create Tab Then Add Function`, async function () {
     await execAsync(`teamsfx new --interactive false --app-name ${appName} --capabilities tab`, {
@@ -53,12 +60,14 @@ describe("Test Add Function", function () {
       env: process.env,
       timeout: 0,
     });
+    console.log("Added func1");
 
     await execAsync(`teamsfx resource add azure-function --function-name func2`, {
       cwd: projectPath,
       env: process.env,
       timeout: 0,
     });
+    console.log("Added func2");
 
     console.log(`[Successfully] add function to ${projectPath}`);
 
@@ -116,6 +125,7 @@ describe("Test Add Function", function () {
       }
     }
 
+    console.log("Before deploy");
     // deploy
     await execAsyncWithRetry(`teamsfx deploy function`, {
       cwd: projectPath,
