@@ -23,10 +23,10 @@ import {
 import AppStudioLogin from "../../../src/commonlib/appStudioLogin";
 
 describe("Test Add Function", function () {
-  let testFolder;
-  let appName;
-  let subscription;
-  let projectPath;
+  let testFolder: string;
+  let appName: string;
+  let subscription: string;
+  let projectPath: string;
 
   // Should succeed on the 3rd try
   this.retries(2);
