@@ -38,6 +38,16 @@ describe("Test Add Function", function () {
     projectPath = path.resolve(testFolder, appName);
   });
 
+  afterEach(async () => {
+    // clean up
+    console.log(`[Successfully] start to clean up for ${projectPath}`);
+    if (isMultiEnvEnabled()) {
+      await cleanUp(appName, projectPath, true, false, false, true);
+    } else {
+      await cleanUp(appName, projectPath);
+    }
+  });
+
   it(`Create Tab Then Add Function`, async function () {
     await execAsync(`teamsfx new --interactive false --app-name ${appName} --capabilities tab`, {
       cwd: testFolder,
@@ -192,15 +202,5 @@ describe("Test Add Function", function () {
     // {
     //   /// TODO: add check for publish
     // }
-  });
-
-  after(async () => {
-    // clean up
-    console.log(`[Successfully] start to clean up for ${projectPath}`);
-    if (isMultiEnvEnabled()) {
-      await cleanUp(appName, projectPath, true, false, false, true);
-    } else {
-      await cleanUp(appName, projectPath);
-    }
   });
 });
