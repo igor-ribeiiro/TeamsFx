@@ -70,6 +70,13 @@ export async function activate(context: vscode.ExtensionContext) {
       TreatmentVariables.EmbeddedSurvey,
       true
     )) as boolean | undefined;
+  TreatmentVariableValue.removeCreateFromSample = (await exp
+    .getExpService()
+    .getTreatmentVariableAsync(
+      TreatmentVariables.VSCodeConfig,
+      TreatmentVariables.RemoveCreateFromSample,
+      true
+    )) as boolean | undefined;
 
   // 1.1 Register the creating command.
   const createCmd = vscode.commands.registerCommand("fx-extension.create", (...args) =>
@@ -274,11 +281,11 @@ export async function activate(context: vscode.ExtensionContext) {
   );
   context.subscriptions.push(manifestTemplateCodeLensCmd);
 
-  const openConfigCmd = vscode.commands.registerCommand(
-    "fx-extension.openConfig",
-    (cipher, selection) => Correlator.run(handlers.openConfigFile)
+  const openConfigStateCmd = vscode.commands.registerCommand(
+    "fx-extension.openConfigState",
+    (...args) => Correlator.run(handlers.openConfigStateFile, args)
   );
-  context.subscriptions.push(openConfigCmd);
+  context.subscriptions.push(openConfigStateCmd);
 
   const updateManifestCmd = vscode.commands.registerCommand(
     "fx-extension.updatePreviewFile",
