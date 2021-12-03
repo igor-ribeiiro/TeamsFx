@@ -65,28 +65,43 @@ describe("Test Add Function", function () {
     }
 
     console.log("Start to add function.");
-    await execAsync(`teamsfx resource add azure-function --function-name func1`, {
-      cwd: projectPath,
-      env: process.env,
-      timeout: 0,
-    });
+    try {
+      await execAsync(`teamsfx resource add azure-function --function-name func1`, {
+        cwd: projectPath,
+        env: process.env,
+        timeout: 0,
+      });
+    } catch (e) {
+      console.log(e);
+      throw e;
+    }
     console.log("Added func1");
 
-    await execAsync(`teamsfx resource add azure-function --function-name func2`, {
-      cwd: projectPath,
-      env: process.env,
-      timeout: 0,
-    });
+    try {
+      await execAsync(`teamsfx resource add azure-function --function-name func2`, {
+        cwd: projectPath,
+        env: process.env,
+        timeout: 0,
+      });
+    } catch (e) {
+      console.log(e);
+      throw e;
+    }
     console.log("Added func2");
 
     console.log(`[Successfully] add function to ${projectPath}`);
 
     // set subscription
-    await execAsync(`teamsfx account set --subscription ${subscription}`, {
-      cwd: projectPath,
-      env: process.env,
-      timeout: 0,
-    });
+    try {
+      await execAsync(`teamsfx account set --subscription ${subscription}`, {
+        cwd: projectPath,
+        env: process.env,
+        timeout: 0,
+      });
+    } catch (e) {
+      console.log(e);
+      throw e;
+    }
 
     console.log(`[Successfully] set subscription for ${projectPath}`);
 
