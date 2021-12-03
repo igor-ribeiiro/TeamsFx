@@ -40,11 +40,14 @@ describe("Test Add Function", function () {
     console.log(`[Successfully] scaffold to ${projectPath}`);
 
     if (isMultiEnvEnabled()) {
+      console.log("Enabled multi env.");
       await setSimpleAuthSkuNameToB1Bicep(projectPath, environmentManager.getDefaultEnvName());
     } else {
+      console.log("Disabled multi env.");
       await setSimpleAuthSkuNameToB1(projectPath);
     }
 
+    console.log("Start to add function.");
     await execAsync(`teamsfx resource add azure-function --function-name func1`, {
       cwd: projectPath,
       env: process.env,
