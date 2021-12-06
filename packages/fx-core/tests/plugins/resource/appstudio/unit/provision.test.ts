@@ -87,14 +87,15 @@ describe("Provision Teams app with Azure", () => {
     sandbox.stub(AppStudioPluginImpl.prototype, "getConfigForCreatingManifest" as any).returns({
       tabEndpoint: undefined,
       tabDomain: undefined,
-      aadId: "aadId",
+      aadId: uuid(),
       botDomain: "botDomain",
-      botId: "botId",
-      webApplicationInfoResource: "webApplicationInfoResource",
+      botId: uuid(),
+      webApplicationInfoResource: "api://xx.com",
       teamsAppId: uuid(),
     });
 
     const teamsAppId = await plugin.postProvision(ctx);
+    console.log(teamsAppId);
     chai.assert.isTrue(teamsAppId.isOk());
   });
 });

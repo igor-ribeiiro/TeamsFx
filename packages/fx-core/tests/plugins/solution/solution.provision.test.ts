@@ -516,7 +516,7 @@ describe("provision() happy path for SPFx projects", () => {
     mocker.stub(AppStudioClient, "createApp").resolves(mockedAppDef);
     mocker.stub(AppStudioClient, "updateApp").resolves(mockedAppDef);
     mocker
-      .stub(AppStudioPluginImpl.prototype, "reloadManifestAndCheckRequiredFields" as any)
+      .stub(AppStudioPluginImpl.prototype, "reloadManifest" as any)
       .returns(ok(new TeamsAppManifest()));
   });
 
